@@ -3,7 +3,6 @@
 const Koa = require('koa');
 const logging = require('@kasa/koa-logging');
 const requestId = require('@kasa/koa-request-id');
-const apmMiddleware = require('./middlewares/apm');
 const bodyParser = require('./middlewares/body-parser');
 const cors = require('./middlewares/cors');
 const errorHandler = require('./middlewares/error-handler');
@@ -29,7 +28,6 @@ class App extends Koa {
 
   _configureMiddlewares() {
     this.use(errorHandler());
-    this.use(apmMiddleware());
     this.use(requestId());
     this.use(logging({
       logger,

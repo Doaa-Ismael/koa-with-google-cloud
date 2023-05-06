@@ -4,7 +4,6 @@
 
 // Load APM on production environment
 const config = require('./config');
-const apm = require('./connections/apm');
 const App = require('./app');
 const logger = require('./logger');
 
@@ -12,10 +11,6 @@ const logger = require('./logger');
 const app = new App();
 
 function handleError(err, ctx) {
-  if (apm.active) {
-    apm.captureError(err);
-  }
-
   if (ctx == null) {
     logger.error({ err, event: 'error' }, 'Unhandled exception occured');
   }
