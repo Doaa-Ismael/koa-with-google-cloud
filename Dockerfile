@@ -55,7 +55,7 @@ COPY . .
 # Change permissions for files and directories
 RUN chown -R app:app /app && chmod g+s /app
 # Expose application port
-ENV APP_PORT 7071
+ENV APP_PORT 8080
 EXPOSE ${APP_PORT}
 # Check container health by running a command inside the container
 HEALTHCHECK --interval=5s \
