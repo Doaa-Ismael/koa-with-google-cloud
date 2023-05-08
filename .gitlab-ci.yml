@@ -38,19 +38,20 @@ deployment_preview:
       when: always
     - when: never
   before_script:
-    - apk add git-crypt
-    - echo "$GCLOUD_ACCOUNT" > /tmp/gcloud-account.json
-    - gcloud auth activate-service-account --key-file /tmp/gcloud$GCLOUD_ENV-account.json
-    - gcloud auth configure-docker
-    - gcloud config set project driven-copilot-385919
-    - git-crypt unlock /tmp/git-crypt-key-file
+      - echo "$GCLOUD_ACCOUNT"
+  #    - echo "$GCLOUD_ACCOUNT" | base64 -d > /tmp/gcloud-account.json
+      - echo "$GCLOUD_ACCOUNT" > /tmp/gcloud-account.json
+      - cat /tmp/gcloud-account.json
+      - gcloud auth activate-service-account --key-file /tmp/gcloud$GCLOUD_ENV-account.json
+      - gcloud auth configure-docker
+      - echo "$PROJECT_ID"
+      - gcloud config set project driven-copilot-385919
   script:
     - gcloud config set app/cloud_build_timeout 2700
     - gcloud config set builds/use_kaniko True
     # Cloud Run
     - gcloud builds submit --config preview-cloud-build.yaml
   after_script:
-    - rm /tmp/git-crypt-key-file
     - rm /tmp/gcloud$GCLOUD_ENV-account.json
 
 add_deployment_link_on_PR:
