@@ -1,6 +1,8 @@
 # The sequence of the pipeline
 stages:
   - deploy
+  - deployment preview
+  - add deployment link on MR
 
 # Used to determine which project & env will be used during build & deploy
 variables:
@@ -10,20 +12,52 @@ variables:
   GCLOUD_ACCOUNT: "$GCLOUD_ACCOUNT"
 
 # Deploy to Google Cloud
-deploy:
+#deploy:
+#  image: google/cloud-sdk:alpine
+#  stage: deploy
+#  before_script:
+#    - echo "$GCLOUD_ACCOUNT"
+##    - echo "$GCLOUD_ACCOUNT" | base64 -d > /tmp/gcloud-account.json
+#    - echo "$GCLOUD_ACCOUNT" > /tmp/gcloud-account.json
+#    - cat /tmp/gcloud-account.json
+#    - gcloud auth activate-service-account --key-file /tmp/gcloud$GCLOUD_ENV-account.json
+#    - gcloud auth configure-docker
+#    - echo "$PROJECT_ID"
+#    - gcloud config set project driven-copilot-385919
+#  script:
+#    - gcloud config set app/cloud_build_timeout 2700
+#    - gcloud config set builds/use_kaniko True
+#    # Cloud Run
+#    - gcloud builds submit --config cloud-build.yaml
+
+deployment_preview:
+  stage: deployment preview
   image: google/cloud-sdk:alpine
-  stage: deploy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
+    - when: never
   before_script:
-    - echo "$GCLOUD_ACCOUNT"
-#    - echo "$GCLOUD_ACCOUNT" | base64 -d > /tmp/gcloud-account.json
+    - apk add git-crypt
     - echo "$GCLOUD_ACCOUNT" > /tmp/gcloud-account.json
-    - cat /tmp/gcloud-account.json
     - gcloud auth activate-service-account --key-file /tmp/gcloud$GCLOUD_ENV-account.json
     - gcloud auth configure-docker
-    - echo "$PROJECT_ID"
     - gcloud config set project driven-copilot-385919
+    - git-crypt unlock /tmp/git-crypt-key-file
   script:
     - gcloud config set app/cloud_build_timeout 2700
     - gcloud config set builds/use_kaniko True
     # Cloud Run
-    - gcloud builds submit --config cloud-build.yaml
+    - gcloud builds submit --config preview-cloud-build.yaml
+  after_script:
+    - rm /tmp/git-crypt-key-file
+    - rm /tmp/gcloud$GCLOUD_ENV-account.json
+
+add_deployment_link_on_PR:
+  stage: add deployment link on MR
+  image: debian
+  script:
+    - export GITLAB_TOKEN=$CI_TOKEN
+    - apt-get update
+    - apt-get install -y curl
+    - 'curl --location --request POST "https://gitlab.com/api/v4/projects/$CI_MERGE_REQUEST_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes" --header "PRIVATE-TOKEN: $GITLAB_TOKEN" --header "Content-Type: application/json" --data-raw "{ \"body\": \"Deploy preview ready [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ)!\" }"'
