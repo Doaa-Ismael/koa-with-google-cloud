@@ -6,8 +6,8 @@ stages:
 variables:
   NODE_ENV: "production"
   GCLOUD_ENV: ""
-  GCLOUD_PROJECT: "$GCLOUD_PROJECT_PROD"
-  GCLOUD_ACCOUNT: "$GCLOUD_ACCOUNT_PROD"
+  GCLOUD_PROJECT: "$GCLOUD_PROJECT"
+  GCLOUD_ACCOUNT: "$GCLOUD_ACCOUNT"
 
 # Deploy to Google Cloud
 deploy:
