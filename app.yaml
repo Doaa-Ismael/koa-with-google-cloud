@@ -1,0 +1,9 @@
+runtime: custom
+env: flex
+env_variables:
+  NODE_ENV: production
+  REDISHOST: '10.52.193.6'
+  REDISPORT: '6378'
+service: default
+resources:
+  memory_gb: 4

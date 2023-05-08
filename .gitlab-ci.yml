@@ -1,9 +1,3 @@
-workflow:
-  rules:
-#    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "production")'
-#      when: always
-    - when: always
-
 # The sequence of the pipeline
 stages:
   - deploy
@@ -19,31 +13,15 @@ variables:
 deploy:
   image: google/cloud-sdk:alpine
   stage: deploy
-  rules:
-#    - if: $CI_COMMIT_MESSAGE =~ $NO_PIPELINE_REGEX || $CI_COMMIT_MESSAGE =~ $NO_DEPLOY_REGEX
-#      when: never
-#    - if: $CI_COMMIT_BRANCH != "production"
-#      variables:
-#        NODE_ENV: "staging"
-#        GCLOUD_ENV: "-staging"
-#        GCLOUD_PROJECT: "$GCLOUD_PROJECT_DEV"
-#        GCLOUD_ACCOUNT: "$GCLOUD_ACCOUNT_DEV"
   before_script:
-#    - apk add git-crypt
-#    - cat "$GIT_CRYPT_KEY" | base64 -d > /tmp/git-crypt-key-file
+    - apk add git-crypt
     - echo "$GCLOUD_ACCOUNT"
-#    - echo "$GCLOUD_ACCOUNT" | base64 -d > /tmp/gcloud$GCLOUD_ENV-account.json
-#    - gcloud auth activate-service-account --key-file /tmp/gcloud$GCLOUD_ENV-account.json
-#    - gcloud auth configure-docker
-#    - gcloud config set project $GCLOUD_PROJECT
-#    - git-crypt unlock /tmp/git-crypt-key-file
+    - echo "$GCLOUD_ACCOUNT" | base64 -d > /tmp/gcloud-account.json
+    - gcloud auth activate-service-account --key-file /tmp/gcloud$GCLOUD_ENV-account.json
+    - gcloud auth configure-docker
+    - gcloud config set project $GCLOUD_PROJECT
   script:
     - gcloud config set app/cloud_build_timeout 2700
     - gcloud config set builds/use_kaniko True
     # Cloud Run
     - gcloud builds submit --config cloud-build.yaml
-    # App Engine
-#    - gcloud --quiet app deploy app$GCLOUD_ENV.yaml --image-url=gcr.io/$GCLOUD_PROJECT/cloudrun-image:latest
-#  after_script:
-#    - rm /tmp/git-crypt-key-file
-#    - rm /tmp/gcloud$GCLOUD_ENV-account.json

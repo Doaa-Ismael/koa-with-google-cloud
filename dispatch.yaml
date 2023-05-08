@@ -1,0 +1,16 @@
+dispatch:
+  # Production
+  - url: "dashboard.daliajobs.com/*"
+    service: default
+  - url: "dalia.works/*"
+    service: default
+  - url: "forms.daliajobs.com/*"
+    service: default
+  # demo
+  - url: "*.demo.daliajobs.com/*"
+    service: demo
+  - url: "prestige-care.daliajobs.com/*"
+    service: demo
+  - url: "tmobile.daliajobs.com/*"
+    service: demo
+
