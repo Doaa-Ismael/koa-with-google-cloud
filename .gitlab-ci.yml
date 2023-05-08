@@ -14,7 +14,6 @@ deploy:
   image: google/cloud-sdk:alpine
   stage: deploy
   before_script:
-    - apk add git-crypt
     - echo "$GCLOUD_ACCOUNT"
     - echo "$GCLOUD_ACCOUNT" | base64 -d > /tmp/gcloud-account.json
     - gcloud auth activate-service-account --key-file /tmp/gcloud$GCLOUD_ENV-account.json
