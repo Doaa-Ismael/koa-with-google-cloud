@@ -15,8 +15,8 @@ deploy:
   stage: deploy
   before_script:
     - echo "$GCLOUD_ACCOUNT"
-    - echo "$GCLOUD_ACCOUNT" | base64 -d > /tmp/gcloud-account.json
-    - echo "$GCLOUD_ACCOUNT" | base64 -d
+#    - echo "$GCLOUD_ACCOUNT" | base64 -d > /tmp/gcloud-account.json
+    - echo "$GCLOUD_ACCOUNT" > /tmp/gcloud-account.json
     - cat /tmp/gcloud-account.json
     - gcloud auth activate-service-account --key-file /tmp/gcloud$GCLOUD_ENV-account.json
     - gcloud auth configure-docker
