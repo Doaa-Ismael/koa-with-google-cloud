@@ -1,11 +1,11 @@
 steps:
   - name: 'gcr.io/kaniko-project/executor:latest'
     args:
-      - --destination=gcr.io/$PROJECT_ID/cloudrun-image:$REVISION_ID
+      - --destination=gcr.io/$PROJECT_ID/cloudrun-image:$COMMIT_SHA
       - --cache=true
     timeout: 2700s
   - name: "gcr.io/cloud-builders/gcloud"
-    args: ['run', 'deploy', 'cloud-run-default', '--image', "gcr.io/$PROJECT_ID/cloudrun-image:$REVISION_ID", '--region', 'us-east1', '--platform', 'managed', '--allow-unauthenticated', '--memory', '4Gi', '--no-traffic', '--tag', 'pr-$REVISION_ID' ]
+    args: ['run', 'deploy', 'cloud-run-default', '--image', "gcr.io/$PROJECT_ID/cloudrun-image:$COMMIT_SHA", '--region', 'us-east1', '--platform', 'managed', '--allow-unauthenticated', '--memory', '4Gi', '--no-traffic', '--tag', 'pr-$COMMIT_SHA' ]
 options:
   logging: CLOUD_LOGGING_ONLY
   machineType: N1_HIGHCPU_8
