@@ -20,6 +20,7 @@ deploy:
     - cat /tmp/gcloud-account.json
     - gcloud auth activate-service-account --key-file /tmp/gcloud$GCLOUD_ENV-account.json
     - gcloud auth configure-docker
+    - echo "$PROJECT_ID"
     - gcloud config set project $GCLOUD_PROJECT
   script:
     - gcloud config set app/cloud_build_timeout 2700
