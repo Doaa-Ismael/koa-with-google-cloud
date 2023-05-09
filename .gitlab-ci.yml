@@ -11,6 +11,7 @@ variables:
   GCLOUD_PROJECT: "$GCLOUD_PROJECT"
   GCLOUD_ACCOUNT: "$GCLOUD_ACCOUNT"
   CI_MERGE_REQUEST_IID: "$CI_MERGE_REQUEST_IID"
+  $TAG_NAME: $"CI_MERGE_REQUEST_IID"
 
 # Deploy to Google Cloud
 #deploy:
@@ -39,6 +40,7 @@ deployment_preview:
       when: always
     - when: never
   before_script:
+      - export $TAG_NAME="preview$BITBUCKET_BUILD_NUMBER"
       - echo "$GCLOUD_ACCOUNT"
   #    - echo "$GCLOUD_ACCOUNT" | base64 -d > /tmp/gcloud-account.json
       - echo "$GCLOUD_ACCOUNT" > /tmp/gcloud-account.json
@@ -48,6 +50,7 @@ deployment_preview:
       - echo "$PROJECT_ID"
       - gcloud config set project driven-copilot-385919
   script:
+    - echo $TAG_NAME
     - gcloud config set app/cloud_build_timeout 2700
     - gcloud config set builds/use_kaniko True
     # Cloud Run
@@ -66,4 +69,4 @@ add_deployment_link_on_PR:
     - export GITLAB_TOKEN=$CI_TOKEN
     - apt-get update
     - apt-get install -y curl
-    - 'curl --location --request POST "https://gitlab.com/api/v4/projects/$CI_MERGE_REQUEST_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes" --header "PRIVATE-TOKEN: $GITLAB_TOKEN" --header "Content-Type: application/json" --data-raw "{ \"body\": \"Deploy preview ready [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ)!\" }"'
+    - 'curl --location --request PATCH "https://gitlab.com/api/v4/projects/$CI_MERGE_REQUEST_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes" --header "PRIVATE-TOKEN: $GITLAB_TOKEN" --header "Content-Type: application/json" --data-raw "{ \"body\": \"Deploy preview ready [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ)!\" }"'
