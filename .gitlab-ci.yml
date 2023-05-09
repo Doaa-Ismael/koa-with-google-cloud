@@ -53,7 +53,7 @@ deployment_preview:
     - gcloud config set app/cloud_build_timeout 2700
     - gcloud config set builds/use_kaniko True
     # Cloud Run
-    - gcloud builds submit --config preview-cloud-build.yaml
+    - gcloud builds submit --config preview-cloud-build.yaml  --substitutions=TAG_NAME="$CI_MERGE_REQUEST_IID"
   after_script:
     - rm /tmp/gcloud$GCLOUD_ENV-account.json
 
