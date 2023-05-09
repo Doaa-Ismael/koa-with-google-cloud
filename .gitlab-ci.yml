@@ -3,6 +3,7 @@ stages:
   - deploy
   - deployment preview
   - add deployment link on MR
+  - stage2
 
 # Used to determine which project & env will be used during build & deploy
 variables:
@@ -40,16 +41,12 @@ deployment_preview:
     - when: never
   before_script:
       - export TAG_NAME=$CI_MERGE_REQUEST_IID
-      - echo "$GCLOUD_ACCOUNT"
-  #    - echo "$GCLOUD_ACCOUNT" | base64 -d > /tmp/gcloud-account.json
       - echo "$GCLOUD_ACCOUNT" > /tmp/gcloud-account.json
       - cat /tmp/gcloud-account.json
       - gcloud auth activate-service-account --key-file /tmp/gcloud$GCLOUD_ENV-account.json
       - gcloud auth configure-docker
-      - echo "$PROJECT_ID"
       - gcloud config set project driven-copilot-385919
   script:
-    - echo $TAG_NAME
     - gcloud config set app/cloud_build_timeout 2700
     - gcloud config set builds/use_kaniko True
     # Cloud Run
@@ -69,3 +66,12 @@ add_deployment_link_on_PR:
     - apt-get update
     - apt-get install -y curl
     - 'curl --location --request PATCH "https://gitlab.com/api/v4/projects/$CI_MERGE_REQUEST_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes" --header "PRIVATE-TOKEN: $GITLAB_TOKEN" --header "Content-Type: application/json" --data-raw "{ \"body\": \"Deploy preview ready [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ)!\" }"'
+
+
+job2:
+  stage: stage2
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+    ####
+  script:
+    - echo "Running STAGE2!   pipeline_source=$CI_PIPELINE_SOURCE"
