@@ -1,6 +1,6 @@
 # The sequence of the pipeline
 stages:
-  - deploy
+#  - deploy
   - deployment preview
 #  - add deployment link on MR
 #  - stage2
