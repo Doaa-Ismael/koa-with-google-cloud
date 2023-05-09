@@ -2,8 +2,8 @@
 stages:
   - deploy
   - deployment preview
-  - add deployment link on MR
-  - stage2
+#  - add deployment link on MR
+#  - stage2
 
 # Used to determine which project & env will be used during build & deploy
 variables:
@@ -51,6 +51,11 @@ deployment_preview:
     - gcloud config set builds/use_kaniko True
     # Cloud Run
     - gcloud builds submit --config preview-cloud-build.yaml  --substitutions=TAG_NAME="$CI_MERGE_REQUEST_IID"
+    - export GITLAB_TOKEN=$CI_TOKEN
+    - apt-get update
+    - apt-get install -y curl
+    - 'curl --location --request POST "https://gitlab.com/api/v4/projects/$CI_MERGE_REQUEST_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes" --header "PRIVATE-TOKEN: $GITLAB_TOKEN" --header "Content-Type: application/json" --data-raw "{ \"body\": \"Deploy preview is ready [here](https://pr-$$CI_MERGE_REQUEST_IID---$GCLOUD_RUN_SERVICE_URL_DEV!\" }"'
+
   after_script:
     - rm /tmp/gcloud$GCLOUD_ENV-account.json
 
@@ -68,10 +73,10 @@ add_deployment_link_on_PR:
     - 'curl --location --request PATCH "https://gitlab.com/api/v4/projects/$CI_MERGE_REQUEST_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes" --header "PRIVATE-TOKEN: $GITLAB_TOKEN" --header "Content-Type: application/json" --data-raw "{ \"body\": \"Deploy preview ready [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ)!\" }"'
 
 
-job2:
-  stage: stage2
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
-    ####
-  script:
-    - echo "Running STAGE2!   pipeline_source=$CI_PIPELINE_SOURCE"
+#job2:
+#  stage: stage2
+#  rules:
+#    - if: $CI_PIPELINE_SOURCE == "push"
+#    ####
+#  script:
+#    - echo "Running STAGE2!   pipeline_source=$CI_PIPELINE_SOURCE"
