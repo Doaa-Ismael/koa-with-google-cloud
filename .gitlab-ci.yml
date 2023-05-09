@@ -40,7 +40,7 @@ deployment_preview:
       when: always
     - when: never
   before_script:
-      - export $TAG_NAME="preview$BITBUCKET_BUILD_NUMBER"
+#      - export $TAG_NAME="preview$BITBUCKET_BUILD_NUMBER"
       - echo "$GCLOUD_ACCOUNT"
   #    - echo "$GCLOUD_ACCOUNT" | base64 -d > /tmp/gcloud-account.json
       - echo "$GCLOUD_ACCOUNT" > /tmp/gcloud-account.json
