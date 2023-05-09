@@ -2,7 +2,7 @@
 stages:
 #  - deploy
   - deployment preview
-#  - add deployment link on MR
+  - add deployment link on MR
 #  - stage2
 
 # Used to determine which project & env will be used during build & deploy
