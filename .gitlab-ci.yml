@@ -11,7 +11,6 @@ variables:
   GCLOUD_PROJECT: "$GCLOUD_PROJECT"
   GCLOUD_ACCOUNT: "$GCLOUD_ACCOUNT"
   CI_MERGE_REQUEST_IID: "$CI_MERGE_REQUEST_IID"
-  TAG_NAME: "$CI_MERGE_REQUEST_IID"
 
 # Deploy to Google Cloud
 #deploy:
@@ -40,7 +39,7 @@ deployment_preview:
       when: always
     - when: never
   before_script:
-#      - export $TAG_NAME="preview$BITBUCKET_BUILD_NUMBER"
+      - export $TAG_NAME = "$CI_MERGE_REQUEST_IID"
       - echo "$GCLOUD_ACCOUNT"
   #    - echo "$GCLOUD_ACCOUNT" | base64 -d > /tmp/gcloud-account.json
       - echo "$GCLOUD_ACCOUNT" > /tmp/gcloud-account.json
