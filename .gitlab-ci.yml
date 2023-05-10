@@ -59,18 +59,18 @@ deployment_preview:
   after_script:
     - rm /tmp/gcloud$GCLOUD_ENV-account.json
 
-add_deployment_link_on_PR:
-  stage: add deployment link on MR
-  image: debian
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: always
-    - when: never
-  script:
-    - export GITLAB_TOKEN=$CI_TOKEN
-    - apk update
-    - apk --no-cache add curl
-    - 'curl --location --request PATCH "https://gitlab.com/api/v4/projects/$CI_MERGE_REQUEST_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes" --header "PRIVATE-TOKEN: $GITLAB_TOKEN" --header "Content-Type: application/json" --data-raw "{ \"body\": \"Deploy preview ready [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ)!\" }"'
+#add_deployment_link_on_PR:
+#  stage: add deployment link on MR
+#  image: debian
+#  rules:
+#    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+#      when: always
+#    - when: never
+#  script:
+#    - export GITLAB_TOKEN=$CI_TOKEN
+#    - apk update
+#    - apk --no-cache add curl
+#    - 'curl --location --request PATCH "https://gitlab.com/api/v4/projects/$CI_MERGE_REQUEST_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes" --header "PRIVATE-TOKEN: $GITLAB_TOKEN" --header "Content-Type: application/json" --data-raw "{ \"body\": \"Deploy preview ready [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ)!\" }"'
 
 
 #job2:
