@@ -54,7 +54,7 @@ deployment_preview:
     - export GITLAB_TOKEN=$CI_TOKEN
     - apk update
     - apk --no-cache add curl
-    - 'curl --location --request POST "https://gitlab.com/api/v4/projects/$CI_MERGE_REQUEST_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes" --header "PRIVATE-TOKEN: $GITLAB_TOKEN" --header "Content-Type: application/json" --data-raw "{ \"body\": \"Deploy preview is ready [here](https://pr-$$CI_MERGE_REQUEST_IID---$GCLOUD_RUN_SERVICE_URL_DEV!\" }"'
+    - 'curl --location --request POST "https://gitlab.com/api/v4/projects/$CI_MERGE_REQUEST_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes" --header "PRIVATE-TOKEN: $GITLAB_TOKEN" --header "Content-Type: application/json" --data-raw "{ \"body\": \"Deploy preview is ready [here](https://pr-$CI_MERGE_REQUEST_IID---$GCLOUD_RUN_SERVICE_URL_DEV!\" }"'
 
   after_script:
     - rm /tmp/gcloud$GCLOUD_ENV-account.json
