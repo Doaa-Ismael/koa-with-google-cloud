@@ -4108,14 +4108,7 @@
     "path-to-regexp" "^1.1.1"
     "urijs" "^1.19.0"
 
-"koa-subdomain@^3.0.0":
-  "integrity" "sha512-79N52+J6nFMdh6e7gx0jM6473ckgBzAJG4FMnqxwflXCz/lRxtUcZFDl44FH1bgBwCBR6+p/h/LqFV3zxhPtow=="
-  "resolved" "https://registry.npmjs.org/koa-subdomain/-/koa-subdomain-3.0.0.tgz"
-  "version" "3.0.0"
-  dependencies:
-    "debug" "^4.0.1"
-
-"koa@^2", "koa@^2.13.1":
+"koa@^2.13.1":
   "integrity" "sha512-Lb2Dloc72auj5vK4X4qqL7B5jyDPQaZucc9sR/71byg7ryoD1NCaCm63CShk9ID9quQvDEi1bGR/iGjCG7As3w=="
   "resolved" "https://registry.npmjs.org/koa/-/koa-2.13.1.tgz"
   "version" "2.13.1"
