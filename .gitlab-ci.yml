@@ -1,6 +1,9 @@
 # The sequence of the pipeline
 stages:
-  - deploy
+#  - deploy
+- deployment preview
+- clean up cloud run revisions
+#  - add deployment link on MR
 
 # Used to determine which project & env will be used during build & deploy
 variables:
@@ -8,22 +11,95 @@ variables:
   GCLOUD_ENV: ""
   GCLOUD_PROJECT: "$GCLOUD_PROJECT"
   GCLOUD_ACCOUNT: "$GCLOUD_ACCOUNT"
+  CI_MERGE_REQUEST_IID: "$CI_MERGE_REQUEST_IID"
 
 # Deploy to Google Cloud
-deploy:
+#deploy:
+#  image: google/cloud-sdk:alpine
+#  stage: deploy
+#  before_script:
+#    - echo "$GCLOUD_ACCOUNT"
+##    - echo "$GCLOUD_ACCOUNT" | base64 -d > /tmp/gcloud-account.json
+#    - echo "$GCLOUD_ACCOUNT" > /tmp/gcloud-account.json
+#    - cat /tmp/gcloud-account.json
+#    - gcloud auth activate-service-account --key-file /tmp/gcloud$GCLOUD_ENV-account.json
+#    - gcloud auth configure-docker
+#    - echo "$PROJECT_ID"
+#    - gcloud config set project driven-copilot-385919
+#  script:
+#    - gcloud config set app/cloud_build_timeout 2700
+#    - gcloud config set builds/use_kaniko True
+#    # Cloud Run
+#    - gcloud builds submit --config cloud-build.yaml
+
+deployment_preview:
+  stage: deployment preview
   image: google/cloud-sdk:alpine
-  stage: deploy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
+    - when: never
   before_script:
-    - echo "$GCLOUD_ACCOUNT"
-#    - echo "$GCLOUD_ACCOUNT" | base64 -d > /tmp/gcloud-account.json
-    - echo "$GCLOUD_ACCOUNT" > /tmp/gcloud-account.json
-    - cat /tmp/gcloud-account.json
-    - gcloud auth activate-service-account --key-file /tmp/gcloud$GCLOUD_ENV-account.json
-    - gcloud auth configure-docker
-    - echo "$PROJECT_ID"
-    - gcloud config set project driven-copilot-385919
+      - export TAG_NAME=$CI_MERGE_REQUEST_IID
+      - echo "$GCLOUD_ACCOUNT" > /tmp/gcloud-account.json
+      - cat /tmp/gcloud-account.json
+      - gcloud auth activate-service-account --key-file /tmp/gcloud$GCLOUD_ENV-account.json
+      - gcloud auth configure-docker
+      - gcloud config set project driven-copilot-385919
   script:
     - gcloud config set app/cloud_build_timeout 2700
     - gcloud config set builds/use_kaniko True
     # Cloud Run
-    - gcloud builds submit --config cloud-build.yaml
+    - gcloud builds submit --config preview-cloud-build.yaml  --substitutions=TAG_NAME="$CI_MERGE_REQUEST_IID"
+    - export GITLAB_TOKEN=$CI_TOKEN
+    - apk update
+    - apk --no-cache add curl
+    - 'curl --location --request POST "https://gitlab.com/api/v4/projects/$CI_MERGE_REQUEST_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes" --header "PRIVATE-TOKEN: $GITLAB_TOKEN" --header "Content-Type: application/json" --data-raw "{ \"body\": \"Deploy preview is ready [here](https://pr-$CI_MERGE_REQUEST_IID---$GCLOUD_RUN_SERVICE_URL_DEV)!\" }"'
+
+  after_script:
+    - rm /tmp/gcloud$GCLOUD_ENV-account.json
+
+
+# Cleanup tags against closed pull requests
+cleanup_tags_on_merged_pull_requests:
+  stage: clean up cloud run revisions
+  image: "gcr.io/${PROJECT_ID}/deployment-previews" # our custom builder
+  rules:
+    - if $CI_PIPELINE_SOURCE == "merge_request_event"
+  variables:
+    PROJECT_ID: "$PROJECT_ID"
+    REPO_NAME: "$REPO_NAME"
+    script:
+      [
+        "cleanup",
+        "--project-id",
+        "${PROJECT_ID}",
+        "--region",
+        "us-east1",
+        "--service",
+        "cloud-run-default",
+        "--repo-name",
+        "${REPO_NAME}",
+      ]
+
+#add_deployment_link_on_PR:
+#  stage: add deployment link on MR
+#  image: debian
+#  rules:
+#    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+#      when: always
+#    - when: never
+#  script:
+#    - export GITLAB_TOKEN=$CI_TOKEN
+#    - apk update
+#    - apk --no-cache add curl
+#    - 'curl --location --request PATCH "https://gitlab.com/api/v4/projects/$CI_MERGE_REQUEST_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes" --header "PRIVATE-TOKEN: $GITLAB_TOKEN" --header "Content-Type: application/json" --data-raw "{ \"body\": \"Deploy preview ready [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ)!\" }"'
+
+
+#job2:
+#  stage: stage2
+#  rules:
+#    - if: $CI_PIPELINE_SOURCE == "push"
+#    ####
+#  script:
+#    - echo "Running STAGE2!   pipeline_source=$CI_PIPELINE_SOURCE"
