@@ -52,7 +52,7 @@ class App extends Koa {
 
   _configureRoutes() {
     const newRouter = new Router();
-    newRouter.get('/', (ctx) => ctx.body = 'hello!');
+    newRouter.get('/', (ctx) => ctx.body = 'hello from "try-cleaning-stage-on-ci" branch! ');
     newRouter.get('/2', (ctx) => ctx.body = 'hello again!');
     // const globalRouter = new Router();
 
